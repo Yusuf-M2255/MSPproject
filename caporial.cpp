@@ -8,7 +8,7 @@ int main()
     char a , b;
     cin >> a >> b;
 
-    long long cap_a = 1 , cap_b = 1;
+    int cap_a = 1 , cap_b = 1;
 
     for (int i = 1; i <= a ; i++)
     {
