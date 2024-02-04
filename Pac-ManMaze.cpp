@@ -13,7 +13,7 @@ int main()
 	float delay = 0.05f;
 	float timer = 0;
 	int i = 0;
-	Vector2f velocity = { 100,100 };
+	//Vector2f velocity = { 200,200 };
 
 	Texture mapTexture;
 	mapTexture.loadFromFile("./resize map.png");
@@ -26,7 +26,7 @@ int main()
 	Sprite pacman;
 	pacman.setTexture(pacmantexture);
 	pacman.setTextureRect(IntRect(480.0f / 3.0f, 0, 16, 16));
-	pacman.setScale(3.f, 3.f);
+	pacman.setScale(2.5f, 2.5f);
 	pacman.setPosition(500, 500);
 
 
@@ -75,6 +75,7 @@ int main()
 
 	while (window.isOpen())
 	{
+		Vector2f velocity = { 150,150 };
 		gameClock.restart();
 		Event e;
 		while (window.pollEvent(e))
@@ -82,7 +83,6 @@ int main()
 			if (e.type == Event::Closed)
 				window.close();
 		}
-		// gravity collision
 		for (int y = 0; y < 29; ++y) {
 			for (int x = 0; x < 31; ++x) {
 				if (mapSketch[x][y] == '#')
@@ -103,10 +103,8 @@ int main()
 			player.move(0, dt * g);*/
 
 
-		//	// player movements
 		
-		
-		
+			// player movements
 			if (Keyboard::isKeyPressed(Keyboard::D) || Keyboard::isKeyPressed(Keyboard::Right))
 			{
 				if (timer < 0)
@@ -177,17 +175,60 @@ int main()
 				pacman.move(-velocity.x * deltaTime, 0);
 
 			}
+			// teleport
+			if (pacman.getGlobalBounds().left < 455.f)
+				pacman.setPosition(998+455-pacman.getGlobalBounds().width, pacman.getGlobalBounds().top);
+			else if(pacman.getGlobalBounds().left+ pacman.getGlobalBounds().width > 998.f + 455.f)
+				pacman.setPosition( 455, pacman.getGlobalBounds().top);
+			// colision
 			for (int i = 0; i < fullPix.size(); i++)
 			{
 				if (fullPix[i].getGlobalBounds().intersects(pacman.getGlobalBounds()))
 				{
-					if (pacman.getGlobalBounds().intersects(FloatRect(fullPix[i].getGlobalBounds().left - 1, fullPix[i].getGlobalBounds().top, 1, fullPix[i].getGlobalBounds().height)))
+					// Right
+					if (pacman.getGlobalBounds().left < fullPix[i].getGlobalBounds().left
+						&& pacman.getGlobalBounds().left + pacman.getGlobalBounds().width < fullPix[i].getGlobalBounds().left + fullPix[i].getGlobalBounds().width
+						&& pacman.getGlobalBounds().top < fullPix[i].getGlobalBounds().top + fullPix[i].getGlobalBounds().height
+						&& pacman.getGlobalBounds().top + pacman.getGlobalBounds().height > fullPix[i].getGlobalBounds().top
+						)
 					{
-						pacman.move(-velocity.x * deltaTime, 0);
+						velocity.x = 0.f;
+						pacman.setPosition(fullPix[i].getGlobalBounds().left - pacman.getGlobalBounds().width, pacman.getGlobalBounds().top);
+					}
+					// Left
+					else if (pacman.getGlobalBounds().left > fullPix[i].getGlobalBounds().left
+						&& pacman.getGlobalBounds().left + pacman.getGlobalBounds().width > fullPix[i].getGlobalBounds().left + fullPix[i].getGlobalBounds().width
+						&& pacman.getGlobalBounds().top < fullPix[i].getGlobalBounds().top + fullPix[i].getGlobalBounds().height
+						&& pacman.getGlobalBounds().top + pacman.getGlobalBounds().height > fullPix[i].getGlobalBounds().top
+						)
+					{
+						velocity.x = 0.f;
+						pacman.setPosition(fullPix[i].getGlobalBounds().left + fullPix[i].getGlobalBounds().width, pacman.getGlobalBounds().top);
+					}
+					// Top
+					else if (pacman.getGlobalBounds().top > fullPix[i].getGlobalBounds().top
+						&& pacman.getGlobalBounds().top + pacman.getGlobalBounds().height > fullPix[i].getGlobalBounds().top + fullPix[i].getGlobalBounds().height
+						&& pacman.getGlobalBounds().left < fullPix[i].getGlobalBounds().left + fullPix[i].getGlobalBounds().width
+						&& pacman.getGlobalBounds().left + pacman.getGlobalBounds().width > fullPix[i].getGlobalBounds().left
+						)
+					{
+						velocity.y = 0.f;
+						pacman.setPosition(pacman.getGlobalBounds().left, fullPix[i].getGlobalBounds().top + fullPix[i].getGlobalBounds().height);
+					}
+					//  Bottom
+					else if (pacman.getGlobalBounds().top < fullPix[i].getGlobalBounds().top
+						&& pacman.getGlobalBounds().top + pacman.getGlobalBounds().height < fullPix[i].getGlobalBounds().top + fullPix[i].getGlobalBounds().height
+						&& pacman.getGlobalBounds().left < fullPix[i].getGlobalBounds().left + fullPix[i].getGlobalBounds().width
+						&& pacman.getGlobalBounds().left + pacman.getGlobalBounds().width > fullPix[i].getGlobalBounds().left
+						)
+					{
+						velocity.y = 0.f;
+						pacman.setPosition(pacman.getGlobalBounds().left, fullPix[i].getGlobalBounds().top - pacman.getGlobalBounds().height);
 					}
 
 
-					else if (pacman.getGlobalBounds().intersects(FloatRect(fullPix[i].getGlobalBounds().left + fullPix[i].getGlobalBounds().width, fullPix[i].getGlobalBounds().top, 1, fullPix[i].getGlobalBounds().height)))
+
+					/*else if (pacman.getGlobalBounds().intersects(FloatRect(fullPix[i].getGlobalBounds().left + fullPix[i].getGlobalBounds().width, fullPix[i].getGlobalBounds().top, 1, fullPix[i].getGlobalBounds().height)))
 					{
 						pacman.move(velocity.x * deltaTime, 0);
 					}
@@ -199,10 +240,9 @@ int main()
 					else if (pacman.getGlobalBounds().intersects(FloatRect(fullPix[i].getGlobalBounds().left, fullPix[i].getGlobalBounds().top + fullPix[i].getGlobalBounds().height, fullPix[i].getGlobalBounds().width, 1)))
 					{
 						pacman.move(0, velocity.y * deltaTime);
-					}
+					}*/
 				}
 			}
-		
        
  
         
