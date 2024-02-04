@@ -588,15 +588,15 @@ int main()
 
 	vector<string> mapSketch = {
 		"############################",
-		"#            ##            #",
+		"#   1        ##           1#",
 		"#            ##            #",
 		"#  ###  ##   ##   ###  ##  #",
 		"#                          #",
 		"#                          #",
 		"#   ##     ######     ##   #",
 		"#   ##     ######     ##   #",
-		"#      #    ##      #      #",
-		"#      #    ##      #      #",
+		"#      #     ##     #      #",
+		"#      #     ##     #      #",
 		"#####  ###        ###  #####",
 		"#####  #            #  #####",
 		"#####  #            #  #####",
@@ -611,11 +611,11 @@ int main()
 		"#            ##            #",
 		"#  ###  ###      ###  ###  #",
 		"#    #                #    #",
-		"##   #                #   ##",
+		"##   #                # 1 ##",
 		"##     #   #####   #      ##",
 		"#      #     #     #       #",
 		"#  #####     #     #####   #",
-		"#                          #",
+		"#     1                    #",
 		"#                          #",
 		"############################",
 	};
@@ -644,7 +644,8 @@ int main()
 		"###################",
 	};*/
 	vector<RectangleShape> fullPix;
-	vector<CircleShape> Points;
+	vector<CircleShape> points;
+	vector<CircleShape> powerUps;
 
 	while (window.isOpen())
 	{
@@ -676,9 +677,18 @@ int main()
 					point.setPosition(470 + y * (1080.f / 30),15 + x * (998.f / 28.f));
 					point.setScale((1080.f / 30), (998.f / 28.f));
 					point.setFillColor(Color::Yellow);
-					Points.push_back(point);
+					points.push_back(point);
 					window.draw(point);
 
+				}
+				else if (mapSketch[x][y] == '1')
+				{
+					CircleShape powerUp(0.5f);
+					powerUp.setPosition(450 + y * (1080.f / 30), 15 + x * (998.f / 28.f));
+					powerUp.setScale((1080.f / 30), (998.f / 28.f));
+					powerUp .setFillColor(Color::Magenta);
+					powerUps.push_back(powerUp);
+					window.draw(powerUp);
 				}
 			}
 			cout << endl;
@@ -774,6 +784,7 @@ int main()
 		if (GameMode != 0)
 			PacPlayMode(GameMode);
 
+		window.display();
 
 		deltaTime = gameClock.getElapsedTime().asSeconds();
 	}
